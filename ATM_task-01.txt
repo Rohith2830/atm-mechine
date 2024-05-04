@@ -1,0 +1,164 @@
+class User:
+    def __init__(self, user_id, pin):
+        self.user_id = user_id
+        self.pin = pin
+        self.balance = 0  # Assuming starting balance is zero
+        self.transaction_history = []
+
+    def deposit(self, amount):
+        self.balance += amount
+        self.transaction_history.append(f"Deposited ${amount}")
+
+    def withdraw(self, amount):
+        if self.balance >= amount:
+            self.balance -= amount
+            self.transaction_history.append(f"Withdrew ${amount}")
+        else:
+            print("Insufficient funds")
+
+    def transfer(self, recipient, amount):
+        if self.balance >= amount:
+            self.balance -= amount
+            recipient.balance += amount
+            self.transaction_history.append(f"Transferred ${amount} to {recipient.user_id}")
+        else:
+            print("Insufficient funds")
+
+    def print_transaction_history(self):
+        print("Transaction History:")
+        for transaction in self.transaction_history:
+            print(transaction)
+
+
+class ATM:
+    def __init__(self):
+        self.users = {}  # Dictionary to store user_id : User object mappings
+
+    def add_user(self, user_id, pin):
+        if user_id not in self.users:
+            self.users[user_id] = User(user_id, pin)
+        else:
+            print("User already exists")
+
+    def authenticate_user(self, user_id, pin):
+        if user_id in self.users:
+            if self.users[user_id].pin == pin:
+                return self.users[user_id]
+            else:
+                print("Incorrect PIN")
+        else:
+            print("User not found")
+
+    def start(self):
+        print("Welcome to the ATM")
+        user_id = input("Enter your user ID: ")
+        pin = input("Enter your PIN: ")
+
+        user = self.authenticate_user(user_id, pin)
+        if user:
+            self.atm_menu(user)
+
+    def atm_menu(self, user):
+        while True:
+            print("\n1. Transactions History")
+            print("2. Withdraw")
+            print("3. Deposit")
+            print("4. Transfer")
+            print("5. Quit")
+
+            choice = input("Enter your choice: ")
+
+            if choice == "1":
+                user.print_transaction_history()
+            elif choice == "2":
+                amount = float(input("Enter amount to withdraw: "))
+                user.withdraw(amount)
+            elif choice == "3":
+                amount = float(input("Enter amount to deposit: "))
+                user.deposit(amount)
+            elif choice == "4":
+                recipient_id = input("Enter recipient's user ID: ")
+                amount = float(input("Enter amount to transfer: "))
+                recipient = self.authenticate_user(recipient_id, "")
+                if recipient:
+                    user.transfer(recipient, amount)
+            elif choice == "5":
+                print("Thank you for using the ATM")
+                break
+            else:
+                print("Invalid choice")
+
+# Example usage:
+atm = ATM()
+atm.add_user("user123", "1234")  # Adding a user
+atm.start()  # Starting the ATM
+
+
+output:
+
+Welcome to the ATM
+Enter your user ID: user123
+Enter your PIN: 1234
+
+1. Transactions History
+2. Withdraw
+3. Deposit
+4. Transfer
+5. Quit
+Enter your choice: 3
+Enter amount to deposit: 1000
+
+1. Transactions History
+2. Withdraw
+3. Deposit
+4. Transfer
+5. Quit
+Enter your choice: 1
+Transaction History:
+Deposited $1000.0
+
+1. Transactions History
+2. Withdraw
+3. Deposit
+4. Transfer
+5. Quit
+Enter your choice: 2
+Enter amount to withdraw: 150
+
+1. Transactions History
+2. Withdraw
+3. Deposit
+4. Transfer
+5. Quit
+Enter your choice: 1
+Transaction History:
+Deposited $1000.0
+Withdrew $150.0
+
+1. Transactions History
+2. Withdraw
+3. Deposit
+4. Transfer
+5. Quit
+Enter your choice: 4
+Enter recipient's user ID: user321
+Enter amount to transfer: 50
+User not found
+
+1. Transactions History
+2. Withdraw
+3. Deposit
+4. Transfer
+5. Quit
+Enter your choice: 1
+Transaction History:
+Deposited $1000.0
+Withdrew $150.0
+
+1. Transactions History
+2. Withdraw
+3. Deposit
+4. Transfer
+5. Quit
+Enter your choice: 5
+Thank you for using the ATM
